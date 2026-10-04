@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Library Management System</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ================= LOGIN PAGE ================= -->
+<section id="login-page" class="login hidden">
+  <form id="login-form">
+    <h2>📚 Library Login</h2>
+    <label>Student ID (or "admin")
+      <input id="login-id" autocomplete="username" required>
+    </label>
+    <label>Password
+      <input id="login-pw" type="password" autocomplete="current-password" required>
+    </label>
+    <p id="login-error" class="error"></p>
+    <button class="primary">Log in</button>
+    <p class="hint">Demo — librarian: admin / admin123<br>Student: 2024-001 / 1234</p>
+  </form>
+</section>
+
+<!-- ================= MAIN APP ================= -->
+<div id="app" class="app hidden">
+
+  <!-- Sidebar -->
+  <aside>
+    <h1>📚 Library<br>Manager</h1>
+    <div id="who" class="who"></div>
+
+    <nav id="nav-admin">
+      <button data-page="dashboard">Dashboard</button>
+      <button data-page="books">Books</button>
+      <button data-page="members">Members</button>
+      <button data-page="loans">Loans</button>
+    </nav>
+    <nav id="nav-student">
+      <button data-page="browse">Browse books</button>
+      <button data-page="mine">My loans</button>
+    </nav>
+
+    <div class="spacer"></div>
+    <button data-act="logout">Log out</button>
+  </aside>
+
+  <main>
+
+    <!-- ---------- Dashboard (librarian) ---------- -->
+    <section id="page-dashboard" class="page hidden">
+      <h2>Dashboard</h2>
+      <div class="stats">
+        <div class="stat"><b id="stat-copies">0</b><span>Total copies</span></div>
+        <div class="stat"><b id="stat-members">0</b><span>Members</span></div>
+        <div class="stat"><b id="stat-loans">0</b><span>On loan</span></div>
+        <div class="stat stat-bad"><b id="stat-overdue">0</b><span>Overdue</span></div>
+      </div>
+      <h2 class="small">Overdue &amp; due soon</h2>
+      <div class="wrap">
+        <table>
+          <thead><tr><th>Book</th><th>Member</th><th>Due</th><th>Status</th></tr></thead>
+          <tbody id="dash-body"></tbody>
+        </table>
+        <p id="dash-empty" class="empty hidden">Nothing here yet.</p>
+      </div>
+    </section>
+
+    <!-- ---------- Books (librarian) ---------- -->
+    <section id="page-books" class="page hidden">
+      <h2>Books</h2>
+      <div class="bar">
+        <input id="books-search" placeholder="Search title, author or ISBN">
+        <button class="primary" data-act="add-book">+ Add book</button>
+      </div>
+      <div class="wrap">
+        <table>
+          <thead><tr><th>Title</th><th>Author</th><th>ISBN</th><th>Available</th><th>Actions</th></tr></thead>
+          <tbody id="books-body"></tbody>
+        </table>
+        <p id="books-empty" class="empty hidden">Nothing here yet.</p>
+      </div>
+    </section>
+
+    <!-- ---------- Members (librarian) ---------- -->
+    <section id="page-members" class="page hidden">
+      <h2>Members</h2>
+      <div class="bar">
+        <input id="members-search" placeholder="Search members">
+        <button class="primary" data-act="add-member">+ Add member</button>
+      </div>
+      <div class="wrap">
+        <table>
+          <thead><tr><th>Name</th><th>Student ID</th><th>Email</th><th>Borrowed</th><th>Actions</th></tr></thead>
+          <tbody id="members-body"></tbody>
+        </table>
+        <p id="members-empty" class="empty hidden">Nothing here yet.</p>
+      </div>
+    </section>
+
+    <!-- ---------- Loans (librarian) ---------- -->
+    <section id="page-loans" class="page hidden">
+      <h2>Loans</h2>
+      <div class="bar">
+        <select id="loans-filter">
+          <option value="active">Active</option>
+          <option value="overdue">Overdue</option>
+          <option value="all">All</option>
+        </select>
+        <button class="primary" data-act="new-loan">+ New loan</button>
+      </div>
+      <div class="wrap">
+        <table>
+          <thead><tr><th>Book</th><th>Member</th><th>Borrowed</th><th>Due</th><th>Status</th><th></th></tr></thead>
+          <tbody id="loans-body"></tbody>
+        </table>
+        <p id="loans-empty" class="empty hidden">Nothing here yet.</p>
+      </div>
+    </section>
+
+    <!-- ---------- Browse books (student) ---------- -->
+    <section id="page-browse" class="page hidden">
+      <h2>Browse books</h2>
+      <p id="browse-count" class="subtitle"></p>
+      <div class="bar">
+        <input id="browse-search" placeholder="Search title, author or ISBN">
+      </div>
+      <div class="wrap">
+        <table>
+          <thead><tr><th>Title</th><th>Author</th><th>Available</th><th></th></tr></thead>
+          <tbody id="browse-body"></tbody>
+        </table>
+        <p id="browse-empty" class="empty hidden">Nothing here yet.</p>
+      </div>
+    </section>
+
+    <!-- ---------- My loans (student) ---------- -->
+    <section id="page-mine" class="page hidden">
+      <h2>My loans</h2>
+      <p class="subtitle">Return books at the library desk.</p>
+      <div class="wrap">
+        <table>
+          <thead><tr><th>Book</th><th>Borrowed</th><th>Due</th><th>Status</th></tr></thead>
+          <tbody id="mine-body"></tbody>
+        </table>
+        <p id="mine-empty" class="empty hidden">Nothing here yet.</p>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- ================= POP-UP FORMS ================= -->
+<dialog id="book-dialog">
+  <form id="book-form">
+    <h3 id="book-heading">Add book</h3>
+    <label>Title <input id="book-title" required></label>
+    <label>Author <input id="book-author" required></label>
+    <label>ISBN <input id="book-isbn" required></label>
+    <label>Copies <input id="book-copies" type="number" min="1" required></label>
+    <div class="row">
+      <button type="button" class="ghost" data-act="close">Cancel</button>
+      <button class="primary">Save</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="member-dialog">
+  <form id="member-form">
+    <h3 id="member-heading">Add member</h3>
+    <label>Full name <input id="member-name" required></label>
+    <label>Student ID (used to log in) <input id="member-sid" required></label>
+    <label>Email <input id="member-email" type="email" required></label>
+    <label>Password <input id="member-pw" required></label>
+    <div class="row">
+      <button type="button" class="ghost" data-act="close">Cancel</button>
+      <button class="primary">Save</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="loan-dialog">
+  <form id="loan-form">
+    <h3>Borrow a book</h3>
+    <label>Book <select id="loan-book" required></select></label>
+    <label>Member <select id="loan-member" required></select></label>
+    <label>Loan period (days) <input id="loan-days" type="number" min="1" value="14" required></label>
+    <div class="row">
+      <button type="button" class="ghost" data-act="close">Cancel</button>
+      <button class="primary">Save</button>
+    </div>
+  </form>
+</dialog>
+
+<script src="script.js"></script>
+</body>
+</html>
